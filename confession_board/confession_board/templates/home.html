@@ -1,0 +1,92 @@
+<!-- confession_board/templates/home.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confession Board</title>
+
+    <!-- Include Bootstrap CSS (you can download it or use CDN) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+    <!-- Add your custom styles if needed -->
+    <style>
+        /* Your custom styles go here */
+    </style>
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Welcome to the Confession Board!</h1>
+
+        <!-- Add your content here -->
+        <!-- For example, you can create a form for submitting confessions -->
+       <!-- confession_board/templates/home.html -->
+
+<form method="post" action="{% url 'submit_confession' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="confessionText">Confession:</label>
+        <textarea class="form-control" id="confessionText" name="confessionText" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Confession</button>
+</form>
+<!-- confession_board/templates/home.html -->
+
+{% for confession in confessions %}
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ confession.text }}</h5>
+            <p>
+                Likes: {{ confession.likes }}
+                Dislikes: {{ confession.dislikes }}
+                {% if 'confession_'|add:confession.id|stringformat:'d'|add:'_liked' in request.session %}
+                    <span class="disabled">Like</span>
+                {% else %}
+                    <a href="{% url 'like_dislike_confession' confession.id 'like' %}">Like</a>
+                {% endif %}
+                <a href="{% url 'like_dislike_confession' confession.id 'dislike' %}">Dislike</a>
+            </p>
+            <ul class="list-group">
+                {% for comment in comments %}
+                    {% if comment.confession == confession %}
+                        <li class="list-group-item">
+                            {{ comment.text }}
+                            <br>
+                            Likes: {{ comment.likes }}
+                            Dislikes: {{ comment.dislikes }}
+                            {% if 'comment_'|add:comment.id|stringformat:'d'|add:'_liked' in request.session %}
+                                <span class="disabled">Like</span>
+                            {% else %}
+                                <a href="{% url 'like_dislike_comment' comment.id 'like' %}">Like</a>
+                            {% endif %}
+                            <a href="{% url 'like_dislike_comment' comment.id 'dislike' %}">Dislike</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+            <!-- Form to add a new comment -->
+            <form method="post" action="{% url 'add_comment' confession.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="commentText">Add a Comment:</label>
+                    <textarea class="form-control" id="commentText" name="commentText" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-secondary">Add Comment</button>
+            </form>
+        </div>
+    </div>
+{% endfor %}
+
+
+<!-- Add your existing form for submitting confessions -->
+<!-- ... -->
+
+    <!-- Include Bootstrap JS and Popper.js (required for Bootstrap components) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+</body>
+</html>
